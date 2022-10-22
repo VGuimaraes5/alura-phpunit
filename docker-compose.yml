@@ -1,0 +1,12 @@
+version: '3.9'
+services:
+  php:
+    image: phpunit
+    container_name: phpunit
+    build:
+      dockerfile: Dockerfile
+    ports:
+      - 80:80
+    volumes:
+      - .:/var/www/html/
+    env_file: .env
