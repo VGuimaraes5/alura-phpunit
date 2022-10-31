@@ -9,7 +9,6 @@ use PHPUnit\Framework\TestCase;
 
 class LeilaoTest extends TestCase
 {
-
     /**
      * @dataProvider geraLances
      */
@@ -22,71 +21,23 @@ class LeilaoTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider geraLancesRepetidos
-     */
-    public function testLeilaoNaoDeveReceberLancesRepetidos(int $qtdLances, Leilao $leilao, array $valores): void
+    public function testLeilaoNaoDeveReceberLancesRepetidos(): void
     {
-        static::assertCount($qtdLances, $leilao->getLances());
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessage('Usuário não pode propor 2 lances consecutivos');
 
-        foreach ($valores as $index => $valor) {
-            static::assertEquals($valor, $leilao->getLances()[$index]->getValor());
-        }
-    }
-
-    /**
-     * @dataProvider geraMuitosLancesRepetidos
-     */
-    public function testLeilaoNaoDeveReceberMaisDeCincoLancesPorUsuario(int $qtdLances, Leilao $leilao): void
-    {
-        static::assertCount($qtdLances, $leilao->getLances());
-
-        $lances = $leilao->getLances();
-        static::assertEquals(2800, end($lances)->getValor());
-    }
-
-    public function geraLances(): array
-    {
-        $leilao1 = new Leilao('Boi Bandido');
-        $leilao2 = new Leilao('Boi Soberano');
-
+        $leilao = new Leilao('Boi Bandido');
         $vini = new Usuario('Vinicius');
-        $bru = new Usuario('Bruna');
 
-        $leilao1->recebeLance(new Lance($vini, 2000));
-
-        $leilao2->recebeLance(new Lance($vini, 1000));
-        $leilao2->recebeLance(new Lance($bru, 1200));
-
-        return [
-            "1Lance" => [1, $leilao1, [2000]],
-            "2Lances" => [2, $leilao2, [1000, 1200]]
-        ];
+        $leilao->recebeLance(new Lance($vini, 2000));
+        $leilao->recebeLance(new Lance($vini, 3000));
     }
 
-    public function geraLancesRepetidos(): array
+    public function testLeilaoNaoDeveReceberMaisDeCincoLancesPorUsuario(): void
     {
-        $leilao1 = new Leilao('Boi Bandido');
-        $leilao2 = new Leilao('Boi Soberano');
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessage('Usuário não pode propor mais de 5 lances por leilão');
 
-        $vini = new Usuario('Vinicius');
-        $bru = new Usuario('Bruna');
-
-        $leilao1->recebeLance(new Lance($vini, 2000));
-        $leilao1->recebeLance(new Lance($vini, 3000));
-
-        $leilao2->recebeLance(new Lance($vini, 1000));
-        $leilao2->recebeLance(new Lance($bru, 1200));
-        $leilao2->recebeLance(new Lance($vini, 1400));
-
-        return [
-            "repedidoEmSequencia" => [1, $leilao1, [2000]],
-            "repetidoForaDeSequencia" => [3, $leilao2, [1000, 1200, 1400]]
-        ];
-    }
-
-    public function geraMuitosLancesRepetidos(): array
-    {
         $leilao = new Leilao('Boi Bandido');
 
         $vini = new Usuario('Vinicius');
@@ -104,11 +55,27 @@ class LeilaoTest extends TestCase
         $leilao->recebeLance(new Lance($vini, 2600));
         $leilao->recebeLance(new Lance($bru, 2800));
 
-        // ignorado
+        // throw exception
         $leilao->recebeLance(new Lance($vini, 3000));
+    }
+
+    public function geraLances(): array
+    {
+        $leilao1 = new Leilao('Boi Bandido');
+        $leilao2 = new Leilao('Boi Soberano');
+
+        $vini = new Usuario('Vinicius');
+        $bru = new Usuario('Bruna');
+
+        $leilao1->recebeLance(new Lance($vini, 1000));
+
+        $leilao2->recebeLance(new Lance($vini, 1000));
+        $leilao2->recebeLance(new Lance($bru, 1500));
+        $leilao2->recebeLance(new Lance($vini, 2000));
 
         return [
-            "repedido6vezes" => [10, $leilao]
+            "1Lance" => [1, $leilao1, [1000]],
+            "3LancesAlternados" => [3, $leilao2, [1000, 1500, 2000]]
         ];
     }
 }

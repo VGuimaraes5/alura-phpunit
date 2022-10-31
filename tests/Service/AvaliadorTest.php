@@ -13,6 +13,7 @@ class AvaliadorTest extends TestCase
 
     private Avaliador $leiloeiro;
 
+    /** @var Avaliador */
     protected function setUp(): void
     {
         $this->leiloeiro = new Avaliador();
@@ -59,6 +60,27 @@ class AvaliadorTest extends TestCase
         self::assertEquals(1500, $maiores[0]->getValor());
         self::assertEquals(1400, $maiores[1]->getValor());
         self::assertEquals(1200, $maiores[2]->getValor());
+    }
+
+    public function testLeilaoVazioNaoPodeSerAvaliado(): void
+    {
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessage('Não é possível avaliar leilão vazio');
+
+        $leilao = new Leilao("Boi Ventania");
+        $this->leiloeiro->avalia($leilao);
+    }
+
+    public function testLeilaoFinalizadoNaoPodeSerAvaliado(): void
+    {
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessage('Leilão já finalizado');
+
+        $leilao = new Leilao("Boi Mocho");
+        $leilao->recebeLance(new Lance(new Usuario("Vini"), 2000));
+        $leilao->finaliza();
+
+        $this->leiloeiro->avalia($leilao);
     }
 
 
