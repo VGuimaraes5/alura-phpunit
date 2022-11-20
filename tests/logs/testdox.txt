@@ -17,3 +17,6 @@ Avaliador (Alura\Leilao\Tests\Service\Avaliador)
  [x] Leilao vazio nao pode ser avaliado
  [x] Leilao finalizado nao pode ser avaliado
 
+Encerrador (Alura\Leilao\Tests\Service\Encerrador)
+ [x] Leiloes com mais de uma semana devem ser encerrados
+
